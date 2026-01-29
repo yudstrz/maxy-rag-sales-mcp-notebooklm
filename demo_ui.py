@@ -37,18 +37,26 @@ st.markdown("""
     
     /* Chat bubbles styling */
     [data-testid="stChatMessage"] {
-        background-color: white;
+        background-color: #ffffff;
         border: 1px solid #e0e0e0;
         border-radius: 12px;
         padding: 1rem;
         margin-bottom: 1rem;
         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        color: #1e1e1e !important; /* Force dark text */
+    }
+    
+    /* Ensure content inside bubbles is also dark */
+    [data-testid="stChatMessage"] p, 
+    [data-testid="stChatMessage"] div,
+    [data-testid="stChatMessage"] span {
+        color: #1e1e1e !important;
     }
     
     /* User message specific style */
     [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
-        background-color: #ffebd9; /* Light orange tint for user */
-        border-color: #ffccbc;
+        background-color: #fff3e0; /* Light orange tint for user */
+        border-color: #ffe0b2;
     }
     
     /* Hide header decorations */
