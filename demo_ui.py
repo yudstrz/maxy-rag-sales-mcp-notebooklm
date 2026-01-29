@@ -273,10 +273,27 @@ if "authenticated" not in st.session_state:
 
 # --- Authentication ---
 def get_notebook_client():
+    """Try multiple authentication methods."""
+    # Method 1: Try the standard get_client (uses cached tokens or env vars)
     try:
         return get_client()
+    except Exception:
+        pass
+    
+    # Method 2: Try loading from cookies.txt in project root
+    try:
+        from notebooklm_mcp.api_client import NotebookLMClient, extract_cookies_from_chrome_export
+        
+        cookies_file = Path(__file__).parent / "cookies.txt"
+        if cookies_file.exists():
+            cookie_header = cookies_file.read_text().strip()
+            if cookie_header:
+                cookies = extract_cookies_from_chrome_export(cookie_header)
+                return NotebookLMClient(cookies=cookies)
     except Exception as e:
-        return None
+        pass
+    
+    return None
 
 if st.session_state.client is None:
     st.session_state.client = get_notebook_client()
