@@ -23,12 +23,29 @@ st.set_page_config(
 # --- Simple Custom Styling ---
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+    /* Apply font to text elements, NOT everything (preserves icons) */
+    html, body, [class*="css"] {
+        font-family: 'Poppins', sans-serif;
+    }
     
-    * { font-family: 'Poppins', sans-serif !important; }
+    /* Force specific text elements to use Poppins */
+    p, h1, h2, h3, h4, h5, h6, span, div, label, input, textarea, button {
+        font-family: 'Poppins', sans-serif;
+    }
+    
+    /* Exclude Material Icons from the font override if possible, 
+       but usually simply NOT targeting * fixes it. */
     
     .stApp {
         background: linear-gradient(135deg, #fff5f0 0%, #ffe0d1 100%);
+    }
+    
+    /* Darken header text */
+    h2 {
+        color: #333 !important;
+    }
+    .stCaption {
+        color: #555 !important;
     }
     
     [data-testid="stChatMessage"] {
