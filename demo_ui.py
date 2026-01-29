@@ -38,7 +38,30 @@ st.markdown("""
     
     /* Page background */
     .stApp {
-        background: linear-gradient(135deg, #fff5f0 0%, #ffe0d1 100%);
+        background: linear-gradient(135deg, #fff5f0 0%, #ffe0d1 100%) !important;
+    }
+    
+    /* Fix dark bottom area */
+    .stApp > div:first-child {
+        background: transparent !important;
+    }
+    
+    .stBottom, [data-testid="stBottom"], .stChatFloatingInputContainer {
+        background: linear-gradient(135deg, #fff5f0 0%, #ffe0d1 100%) !important;
+    }
+    
+    [data-testid="stBottomBlockContainer"] {
+        background: transparent !important;
+        padding: 10px 0 20px 0 !important;
+    }
+    
+    /* Chat input wrapper background */
+    .stChatInput {
+        background: transparent !important;
+    }
+    
+    section[data-testid="stSidebar"], .css-1d391kg, .css-163ttbj {
+        background: linear-gradient(135deg, #fff5f0 0%, #ffe0d1 100%) !important;
     }
     
     /* Main container padding */
@@ -176,10 +199,11 @@ st.markdown("""
     }
     
     .stChatInput > div {
-        background: #f5f5f5 !important;
+        background: white !important;
         border-radius: 25px !important;
-        border: 2px solid transparent !important;
+        border: 2px solid #ffe0d1 !important;
         padding: 5px 10px !important;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05) !important;
     }
     
     .stChatInput > div:focus-within {
@@ -190,6 +214,28 @@ st.markdown("""
     
     .stChatInput textarea {
         font-size: 14px !important;
+        color: #333 !important;
+    }
+    
+    /* Fix ALL dark areas at bottom */
+    .stBottom > div,
+    [data-testid="stBottom"] > div,
+    .stChatFloatingInputContainer > div,
+    [data-testid="stBottomBlockContainer"] > div,
+    .css-1p1nwyz,
+    .css-1aehpvj,
+    .e1f1d6gn0,
+    .e1f1d6gn1,
+    .e1f1d6gn2 {
+        background: transparent !important;
+        background-color: transparent !important;
+    }
+    
+    /* Ensure no dark backgrounds anywhere */
+    [data-testid="stAppViewContainer"],
+    [data-testid="stHeader"],
+    [data-testid="stToolbar"] {
+        background: transparent !important;
     }
     
     /* Typing indicator */
