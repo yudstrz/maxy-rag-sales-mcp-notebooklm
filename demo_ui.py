@@ -1,5 +1,6 @@
 import streamlit as st
 import sys
+import re
 from pathlib import Path
 
 # --- Configuration ---
@@ -130,6 +131,8 @@ if prompt := st.chat_input("Ketik pesan..."):
                     query_text=prompt
                 )
                 answer = response.get("answer", "Maaf, tidak ada jawaban.")
+                # Remove citations like [1], [2], [1, 2]
+                answer = re.sub(r'\s*\[\d+(?:,\s*\d+)*\]', '', answer)
             except Exception as e:
                 answer = f"Maaf, terjadi error: {e}"
         
