@@ -3,7 +3,7 @@ import sys
 from pathlib import Path
 
 # --- Configuration ---
-TARGET_NOTEBOOK_ID = "8d68d6e7-b095-47ab-b016-a69b7377ad9a"
+TARGET_NOTEBOOK_ID = "c317546a-d67c-4f6d-9460-bb02eaa6991f"
 PROJECT_ROOT = Path(__file__).parent
 SRC_PATH = PROJECT_ROOT / "src"
 COOKIES_PATH = PROJECT_ROOT / "cookies.txt"
@@ -72,16 +72,30 @@ except ImportError:
 
 @st.cache_resource
 def get_client():
-    """Load NotebookLM client from cookies.txt"""
+    """Load NotebookLM client from cache or cookies.txt"""
+    # 1. Try loading from MCP cache (Managed by notebooklm-mcp-auth)
+    try:
+        from notebooklm_mcp.auth import load_cached_tokens
+        tokens = load_cached_tokens()
+        if tokens and tokens.cookies:
+            # Check if tokens work
+            client = NotebookLMClient(cookies=tokens.cookies)
+            client.list_notebooks()
+            return client, None
+    except Exception:
+        # If cache fails or is invalid, proceed to fallback
+        pass
+
+    # 2. Fallback to cookies.txt
     if not COOKIES_PATH.exists():
-        return None, "File cookies.txt tidak ditemukan"
+        return None, "File cookies.txt tidak ditemukan. Silakan jalankan `notebooklm-mcp-auth` di terminal."
     try:
         cookies = extract_cookies_from_chrome_export(COOKIES_PATH.read_text().strip())
         client = NotebookLMClient(cookies=cookies)
         client.list_notebooks()
         return client, None
     except Exception as e:
-        return None, str(e)
+        return None, f"Auth Error: {e}. Coba jalankan `notebooklm-mcp-auth` untuk memperbaiki."
 
 # Get client
 client, error = get_client()
