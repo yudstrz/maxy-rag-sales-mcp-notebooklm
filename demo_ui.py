@@ -21,12 +21,17 @@ st.set_page_config(
 # --- CSS ---
 st.markdown("""
 <style>
-    /* Dark text for readability */
-    .stApp, .stApp * {
-        color: #1a1a1a !important;
+    /* Title and header - white for dark mode */
+    h1, .stTitle, [data-testid="stHeading"] h1 {
+        color: #ffffff !important;
     }
     
-    /* Chat messages - make them readable */
+    /* Subtitle/caption */
+    .stCaption, [data-testid="stCaption"], small {
+        color: #cccccc !important;
+    }
+    
+    /* Chat messages - white background, dark text */
     [data-testid="stChatMessage"] {
         background-color: #ffffff !important;
         border: 1px solid #ddd;
@@ -35,17 +40,20 @@ st.markdown("""
         margin: 0.5rem 0;
     }
     
-    [data-testid="stChatMessage"] p {
-        color: #333333 !important;
+    [data-testid="stChatMessage"] p,
+    [data-testid="stChatMessage"] span,
+    [data-testid="stChatMessage"] * {
+        color: #1a1a1a !important;
+    }
+    
+    /* Divider */
+    hr {
+        border-color: #444 !important;
     }
     
     /* Input area */
-    [data-testid="stBottom"] {
-        background-color: #f0f0f0 !important;
-    }
-    
     textarea {
-        color: #1a1a1a !important;
+        color: #ffffff !important;
     }
 </style>
 """, unsafe_allow_html=True)
