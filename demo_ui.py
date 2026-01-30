@@ -3,7 +3,7 @@ import sys
 from pathlib import Path
 
 # --- Configuration ---
-TARGET_NOTEBOOK_ID = "c317546a-d67c-4f6d-9460-bb02eaa6991f"
+TARGET_NOTEBOOK_ID = "8d68d6e7-b095-47ab-b016-a69b7377ad9a"
 PROJECT_ROOT = Path(__file__).parent
 SRC_PATH = PROJECT_ROOT / "src"
 COOKIES_PATH = PROJECT_ROOT / "cookies.txt"
