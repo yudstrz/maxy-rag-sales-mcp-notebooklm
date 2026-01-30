@@ -9,208 +9,106 @@ SRC_PATH = PROJECT_ROOT / "src"
 COOKIES_PATH = PROJECT_ROOT / "cookies.txt"
 
 # Add src to python path
-sys.path.append(str(SRC_PATH))
+sys.path.insert(0, str(SRC_PATH))
 
 # --- Page Setup ---
 st.set_page_config(
-    page_title="NotebookLM Chat",
+    page_title="Maxy Chatbot",
     page_icon="🤖",
-    layout="wide",
-    initial_sidebar_state="collapsed"
+    layout="centered"
 )
 
-# --- CSS - Force Light Theme ---
+# --- Simple CSS ---
 st.markdown("""
 <style>
-    /* Force light background for entire app */
-    .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {
-        background-color: #f8f9fa !important;
+    .stApp {
+        background-color: #f5f5f5;
     }
-    
-    /* Force ALL text to be dark */
-    .stApp, .stApp * {
-        color: #1a1a1a !important;
-    }
-    
-    /* Main container */
-    .block-container {
-        padding-top: 0rem;
-        padding-bottom: 5rem;
-        max-width: 800px;
-    }
-    
-    /* Header styling */
-    .header-container {
-        background: linear-gradient(135deg, #4169E1 0%, #5a7df4 100%);
-        padding: 1.5rem 2rem;
-        border-radius: 0 0 16px 16px;
-        margin-bottom: 1.5rem;
-        margin-top: -1rem;
-        margin-left: -2rem;
-        margin-right: -2rem;
-    }
-    .header-title {
-        color: white !important;
-        font-size: 1.8rem;
-        font-weight: 700;
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-    .header-subtitle {
-        color: rgba(255, 255, 255, 0.85) !important;
-        font-size: 0.95rem;
-        margin-top: 0.3rem;
-    }
-    
-    /* Chat bubbles */
-    [data-testid="stChatMessage"] {
-        background-color: #ffffff !important;
-        border: 1px solid #e0e0e0;
+    .main-header {
+        background: linear-gradient(135deg, #4169E1, #5a7df4);
+        padding: 1.5rem;
         border-radius: 12px;
-        padding: 1rem;
         margin-bottom: 1rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        text-align: center;
     }
-    
-    /* User message style */
-    [data-testid="stChatMessage"]:has([data-testid="chatAvatarIcon-user"]) {
-        background-color: #fff3e0 !important;
-        border-color: #ffe0b2;
+    .main-header h1 {
+        color: white !important;
+        margin: 0;
+        font-size: 1.8rem;
     }
-    
-    /* Hide Streamlit branding */
-    #MainMenu, header, footer {visibility: hidden; display: none;}
-    
-    /* Chat input styling */
-    [data-testid="stChatInput"] textarea {
-        background-color: #ffffff !important;
-        color: #1a1a1a !important;
-    }
-    
-    /* Bottom container fix */
-    [data-testid="stBottom"], [data-testid="stBottomBlockContainer"] {
-        background-color: #f8f9fa !important;
-    }
-    
-    /* Select box styling - make text blue */
-    [data-testid="stSelectbox"] label,
-    [data-testid="stSelectbox"] div[data-baseweb="select"] span {
-        color: #4169E1 !important;
+    .main-header p {
+        color: rgba(255,255,255,0.9) !important;
+        margin: 0.5rem 0 0 0;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# --- Imports & Auth ---
-try:
-    from notebooklm_mcp.server import get_client
-    from notebooklm_mcp.api_client import NotebookLMClient, extract_cookies_from_chrome_export
-except ImportError:
-    st.error("⚠️ Error: Could not import notebooklm_mcp.")
-    st.stop()
-
-@st.cache_resource
-def get_authenticated_client():
-    """Load client with caching."""
-    import json
-    from pathlib import Path
-    
-    # First, try the standard get_client() which uses env vars or cached auth.json
-    try:
-        return get_client()
-    except Exception as e:
-        primary_error = str(e)
-    
-    # Second, try loading from the MCP's cached auth.json
-    auth_cache_path = Path.home() / ".notebooklm-mcp" / "auth.json"
-    if auth_cache_path.exists():
-        try:
-            with open(auth_cache_path) as f:
-                data = json.load(f)
-            cookies = data.get("cookies", {})
-            csrf_token = data.get("csrf_token", "")
-            session_id = data.get("session_id", "")
-            if cookies:
-                return NotebookLMClient(
-                    cookies=cookies,
-                    csrf_token=csrf_token,
-                    session_id=session_id
-                )
-        except Exception:
-            pass
-    
-    # Third, try the project's cookies.txt file
-    if COOKIES_PATH.exists():
-        try:
-            cookies = extract_cookies_from_chrome_export(COOKIES_PATH.read_text().strip())
-            return NotebookLMClient(cookies=cookies)
-        except Exception:
-            pass
-    
-    # Store error for display
-    st.session_state.auth_error = primary_error
-    return None
-
-# --- Initialize ---
-if "client" not in st.session_state:
-    st.session_state.client = get_authenticated_client()
-
-if "messages" not in st.session_state:
-    # Add welcome message from MinMax
-    st.session_state.messages = [
-        {
-            "role": "assistant",
-            "content": "Halo Kak! Selamat datang di Maxy Academy! 👋\n\nAku MinMax, asisten virtual yang siap bantu Kakak cari info program bootcamp, magang, atau tips karir. Ada yang bisa MinMax bantu hari ini? 😊"
-        }
-    ]
-
-# --- Header (using custom HTML with blue background) ---
+# --- Header ---
 st.markdown("""
-<div class="header-container">
-    <div class="header-title">🤖 Chatbot Asisten</div>
-    <div class="header-subtitle">Diskusi langsung dengan referensi dari NotebookLM</div>
+<div class="main-header">
+    <h1>🤖 Maxy Chatbot</h1>
+    <p>Asisten Virtual Maxy Academy</p>
 </div>
 """, unsafe_allow_html=True)
 
-# --- Auth Check ---
-if not st.session_state.client:
-    st.error("🔒 Akses Ditolak: Tidak dapat login ke NotebookLM.")
-    
-    # Show more detailed error info
-    auth_error = st.session_state.get("auth_error", "")
-    if auth_error:
-        st.warning(f"Detail Error: {auth_error}")
-    
-    st.info("""💡 **Cara mengatasi:**
-1. Jalankan `notebooklm-mcp-auth` di terminal untuk autentikasi ulang
-2. Atau pastikan file `~/.notebooklm-mcp/auth.json` berisi token yang valid
-3. Setelah autentikasi, restart aplikasi ini
-""")
+# --- Import & Auth ---
+try:
+    from notebooklm_mcp.api_client import NotebookLMClient, extract_cookies_from_chrome_export
+except ImportError:
+    st.error("⚠️ Import error: notebooklm_mcp tidak ditemukan")
     st.stop()
 
-# --- Display Chat History ---
+@st.cache_resource
+def get_client():
+    """Load NotebookLM client from cookies.txt"""
+    if not COOKIES_PATH.exists():
+        return None, "File cookies.txt tidak ditemukan"
+    try:
+        cookies = extract_cookies_from_chrome_export(COOKIES_PATH.read_text().strip())
+        client = NotebookLMClient(cookies=cookies)
+        # Test connection
+        client.list_notebooks()
+        return client, None
+    except Exception as e:
+        return None, str(e)
+
+# Get client
+client, error = get_client()
+
+if not client:
+    st.error(f"🔒 Gagal login ke NotebookLM: {error}")
+    st.info("💡 Pastikan file `cookies.txt` berisi cookies yang valid dari NotebookLM")
+    st.stop()
+
+# --- Session State ---
+if "messages" not in st.session_state:
+    st.session_state.messages = [
+        {"role": "assistant", "content": "Halo Kak! 👋 Selamat datang di Maxy Academy!\n\nAku MinMax, asisten virtual yang siap bantu Kakak. Ada yang bisa MinMax bantu?"}
+    ]
+
+# --- Display Chat ---
 for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
 
 # --- Chat Input ---
-if prompt := st.chat_input("Ketik pesan Anda..."):
-    # Show user message
+if prompt := st.chat_input("Ketik pesan..."):
+    # Add user message
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
     
-    # Get AI response
+    # Get response
     with st.chat_message("assistant"):
-        with st.spinner("Sedang mencari jawaban..."):
+        with st.spinner("Mencari jawaban..."):
             try:
-                response = st.session_state.client.query(
+                response = client.query(
                     notebook_id=TARGET_NOTEBOOK_ID,
                     query_text=prompt
                 )
-                answer = response.get("answer", "Maaf, saya tidak menemukan jawaban.")
-                st.markdown(answer)
-                st.session_state.messages.append({"role": "assistant", "content": answer})
+                answer = response.get("answer", "Maaf, tidak ada jawaban.")
             except Exception as e:
-                st.error(f"Error: {e}")
+                answer = f"Maaf, terjadi error: {e}"
+        
+        st.markdown(answer)
+        st.session_state.messages.append({"role": "assistant", "content": answer})
