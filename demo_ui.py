@@ -18,38 +18,42 @@ st.set_page_config(
     layout="centered"
 )
 
-# --- Simple CSS ---
+# --- CSS ---
 st.markdown("""
 <style>
-    .stApp {
-        background-color: #f5f5f5;
+    /* Dark text for readability */
+    .stApp, .stApp * {
+        color: #1a1a1a !important;
     }
-    .main-header {
-        background: linear-gradient(135deg, #4169E1, #5a7df4);
-        padding: 1.5rem;
-        border-radius: 12px;
-        margin-bottom: 1rem;
-        text-align: center;
+    
+    /* Chat messages - make them readable */
+    [data-testid="stChatMessage"] {
+        background-color: #ffffff !important;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 1rem;
+        margin: 0.5rem 0;
     }
-    .main-header h1 {
-        color: white !important;
-        margin: 0;
-        font-size: 1.8rem;
+    
+    [data-testid="stChatMessage"] p {
+        color: #333333 !important;
     }
-    .main-header p {
-        color: rgba(255,255,255,0.9) !important;
-        margin: 0.5rem 0 0 0;
+    
+    /* Input area */
+    [data-testid="stBottom"] {
+        background-color: #f0f0f0 !important;
+    }
+    
+    textarea {
+        color: #1a1a1a !important;
     }
 </style>
 """, unsafe_allow_html=True)
 
-# --- Header ---
-st.markdown("""
-<div class="main-header">
-    <h1>🤖 Maxy Chatbot</h1>
-    <p>Asisten Virtual Maxy Academy</p>
-</div>
-""", unsafe_allow_html=True)
+# --- Header using Streamlit native ---
+st.title("🤖 Maxy Chatbot")
+st.caption("Asisten Virtual Maxy Academy")
+st.divider()
 
 # --- Import & Auth ---
 try:
@@ -66,7 +70,6 @@ def get_client():
     try:
         cookies = extract_cookies_from_chrome_export(COOKIES_PATH.read_text().strip())
         client = NotebookLMClient(cookies=cookies)
-        # Test connection
         client.list_notebooks()
         return client, None
     except Exception as e:
@@ -93,12 +96,10 @@ for msg in st.session_state.messages:
 
 # --- Chat Input ---
 if prompt := st.chat_input("Ketik pesan..."):
-    # Add user message
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
     
-    # Get response
     with st.chat_message("assistant"):
         with st.spinner("Mencari jawaban..."):
             try:
