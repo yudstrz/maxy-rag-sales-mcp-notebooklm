@@ -3,7 +3,7 @@ import sys
 from pathlib import Path
 
 # --- Configuration ---
-TARGET_NOTEBOOK_ID = "8d68d6e7-b095-47ab-b016-a69b7377ad9a"
+TARGET_NOTEBOOK_ID = "c317546a-d67c-4f6d-9460-bb02eaa6991f"
 PROJECT_ROOT = Path(__file__).parent
 SRC_PATH = PROJECT_ROOT / "src"
 COOKIES_PATH = PROJECT_ROOT / "cookies.txt"
@@ -113,17 +113,43 @@ except ImportError:
 @st.cache_resource
 def get_authenticated_client():
     """Load client with caching."""
+    import json
+    from pathlib import Path
+    
+    # First, try the standard get_client() which uses env vars or cached auth.json
     try:
         return get_client()
-    except Exception:
-        pass
+    except Exception as e:
+        primary_error = str(e)
     
+    # Second, try loading from the MCP's cached auth.json
+    auth_cache_path = Path.home() / ".notebooklm-mcp" / "auth.json"
+    if auth_cache_path.exists():
+        try:
+            with open(auth_cache_path) as f:
+                data = json.load(f)
+            cookies = data.get("cookies", {})
+            csrf_token = data.get("csrf_token", "")
+            session_id = data.get("session_id", "")
+            if cookies:
+                return NotebookLMClient(
+                    cookies=cookies,
+                    csrf_token=csrf_token,
+                    session_id=session_id
+                )
+        except Exception:
+            pass
+    
+    # Third, try the project's cookies.txt file
     if COOKIES_PATH.exists():
         try:
             cookies = extract_cookies_from_chrome_export(COOKIES_PATH.read_text().strip())
             return NotebookLMClient(cookies=cookies)
         except Exception:
             pass
+    
+    # Store error for display
+    st.session_state.auth_error = primary_error
     return None
 
 # --- Initialize ---
@@ -150,7 +176,17 @@ st.markdown("""
 # --- Auth Check ---
 if not st.session_state.client:
     st.error("🔒 Akses Ditolak: Tidak dapat login ke NotebookLM.")
-    st.info("💡 Pastikan file cookies.txt ada di folder project dan valid.")
+    
+    # Show more detailed error info
+    auth_error = st.session_state.get("auth_error", "")
+    if auth_error:
+        st.warning(f"Detail Error: {auth_error}")
+    
+    st.info("""💡 **Cara mengatasi:**
+1. Jalankan `notebooklm-mcp-auth` di terminal untuk autentikasi ulang
+2. Atau pastikan file `~/.notebooklm-mcp/auth.json` berisi token yang valid
+3. Setelah autentikasi, restart aplikasi ini
+""")
     st.stop()
 
 # --- Display Chat History ---
